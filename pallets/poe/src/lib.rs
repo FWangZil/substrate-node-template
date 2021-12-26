@@ -17,6 +17,7 @@ pub mod pallet {
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+		type AssetDepositBase: Get<usize>;
 	}
 
 	#[pallet::pallet]
@@ -26,20 +27,22 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn proofs)]
 	pub type Proofs<T: Config> =
-	StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, T::BlockNumber)>;
+		StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, T::BlockNumber)>;
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub (super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		ClaimCreated(T::AccountId, Vec<u8>),
 		ClaimRevoked(T::AccountId, Vec<u8>),
+		ClaimTransfer(T::AccountId, Vec<u8>, T::AccountId),
 	}
 
 	#[pallet::error]
 	pub enum Error<T> {
-		ProofAlreadyExist,
+		ClaimAlreadyExist,
 		ClaimNotExist,
 		NotClaimOwner,
+		ClaimHashIsTooLong,
 	}
 
 	#[pallet::hooks]
@@ -51,7 +54,8 @@ pub mod pallet {
 		pub fn create_claim(origin: OriginFor<T>, claim: Vec<u8>) -> DispatchResultWithPostInfo {
 			let sender = ensure_signed(origin)?;
 
-			ensure!(!Proofs::<T>::contains_key(&claim), Error::<T>::ProofAlreadyExist);
+			ensure!(claim.len() <= T::AssetDepositBase::get(), Error::<T>::ClaimHashIsTooLong);
+			ensure!(!Proofs::<T>::contains_key(&claim), Error::<T>::ClaimAlreadyExist);
 
 			Proofs::<T>::insert(
 				&claim,
@@ -64,14 +68,11 @@ pub mod pallet {
 		}
 
 		#[pallet::weight(0)]
-		pub fn revoke_claim(
-			origin: OriginFor<T>,
-			claim: Vec<u8>,
-		) -> DispatchResultWithPostInfo {
+		pub fn revoke_claim(origin: OriginFor<T>, claim: Vec<u8>) -> DispatchResultWithPostInfo {
 			let sender = ensure_signed(origin)?;
 
 			let (owner, _) = Proofs::<T>::get(&claim).ok_or(Error::<T>::ClaimNotExist)?;
-			ensure!(owner==sender,Error::<T>::NotClaimOwner);
+			ensure!(owner == sender, Error::<T>::NotClaimOwner);
 			Proofs::<T>::remove(&claim);
 
 			Self::deposit_event(Event::ClaimRevoked(sender, claim));
@@ -86,12 +87,13 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			let sender = ensure_signed(origin)?;
 
-			let (owner, _block_number) = Proofs::<T>::get(&claim).ok_or(Error::<T>::ClaimNotExist)?;
+			let (owner, _block_number) =
+				Proofs::<T>::get(&claim).ok_or(Error::<T>::ClaimNotExist)?;
 
-			ensure!(owner==sender,Error::<T>::NotClaimOwner);
+			ensure!(owner == sender, Error::<T>::NotClaimOwner);
 
-			Proofs::<T>::insert(&claim, (dest, frame_system::Pallet::<T>::block_number()));
-
+			Proofs::<T>::insert(&claim, (&dest, frame_system::Pallet::<T>::block_number()));
+			Self::deposit_event(Event::ClaimTransfer(sender, claim, dest));
 			Ok(().into())
 		}
 	}

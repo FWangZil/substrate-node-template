@@ -259,6 +259,7 @@ impl pallet_balances::Config for Runtime {
 parameter_types! {
 	pub const TransactionByteFee: Balance = 1;
 	pub OperationalFeeMultiplier: u8 = 5;
+	pub const AssetDepositBase: usize = 16;
 }
 
 impl pallet_transaction_payment::Config for Runtime {
@@ -282,6 +283,7 @@ impl pallet_template::Config for Runtime {
 /// Configure the pallet-poe in pallets/poe.
 impl pallet_poe::Config for Runtime {
 	type Event = Event;
+	type AssetDepositBase = AssetDepositBase;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
