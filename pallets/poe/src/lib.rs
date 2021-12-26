@@ -3,10 +3,15 @@
 /// A module for proof of existence
 pub use pallet::*;
 
+#[cfg(test)]
+mod mock;
+#[cfg(test)]
+mod tests;
+
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
-	use frame_system::{Account, ensure_signed, pallet_prelude::*};
+	use frame_system::{ensure_signed, pallet_prelude::*};
 	use sp_std::vec::Vec;
 
 	#[pallet::config]
@@ -85,7 +90,7 @@ pub mod pallet {
 
 			ensure!(owner==sender,Error::<T>::NotClaimOwner);
 
-			Proofs::<T>::insert(&claim, (dest, frame_system::Pallet::<T>::block_number));
+			Proofs::<T>::insert(&claim, (dest, frame_system::Pallet::<T>::block_number()));
 
 			Ok(().into())
 		}
