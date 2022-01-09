@@ -35,8 +35,10 @@ use sp_std::prelude::*;
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
-/// Import the template pallet.
-// pub use pallet_poe;
+/// Import the pallet.
+pub use pallet_kitties;
+pub use pallet_poe;
+
 pub use pallet_template;
 
 // Make the WASM binary available.
@@ -286,6 +288,19 @@ impl pallet_poe::Config for Runtime {
 	type AssetDepositBase = AssetDepositBase;
 }
 
+parameter_types! {
+	pub const StakeForEachKitty: u128 = 1_000;
+}
+
+/// Configure the pallet-kitties in pallets/kitties.
+impl pallet_kitties::Config for Runtime {
+	type Event = Event;
+	type KittyIndex = u32;
+	type Randomness = RandomnessCollectiveFlip;
+	type Currency = Balances;
+	type StakeForEachKitty = StakeForEachKitty;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -304,6 +319,7 @@ construct_runtime!(
 		// Include the custom logic from the pallet-template in the runtime.
 		TemplateModule: pallet_template,
 		PoeModule: pallet_poe,
+	    KittiesModule: pallet_kitties,
 	}
 );
 

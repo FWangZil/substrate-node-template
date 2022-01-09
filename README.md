@@ -1,5 +1,32 @@
 # Substrate 提交记录
 
+## 编写 kitties 模块 (pallet-kitties)
+
+### 测试
+
+cargo test --color=always -p pallet-kitties
+
+![image-20220109190822967](assets/image-20220109190822967.png)
+
+
+
+### 创建
+
+
+
+### 转移
+
+
+
+### 交易
+
+
+
+### 繁殖
+
+
+
+
 ## 编写存证模块 (pallet-poe)
 
 ### 创建存证
@@ -29,4 +56,3 @@
 ### 单元测试
 
 ![image-20211226221331903](assets/image-20211226221331903.png)
-

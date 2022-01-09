@@ -42,13 +42,45 @@ default-features = false
 features = ['derive']
 version = '1.0'
 
-[dev-dependencies.sp-core]
+[dependencies.sp-std]
 default-features = false
 git = 'https://github.com/paritytech/substrate.git'
 tag = '4.0.0-dev'
 version = '4.0.0-dev'
 
-[dev-dependencies.sp-io]
+[dependencies.sp-io]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = '4.0.0-dev'
+version = '4.0.0-dev'
+
+[dependencies.pallet-balances]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = '4.0.0-dev'
+version = '4.0.0-dev'
+
+[dependencies.num-traits]
+default-features = false
+version = "0.2.8"
+
+[dependencies.pallet-randomness-collective-flip]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = '4.0.0-dev'
+version = '4.0.0-dev'
+
+[dependencies.sp-runtime]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = '4.0.0-dev'
+version = '4.0.0-dev'
+
+[dependencies.log]
+default-features = false
+version = '0.4.14'
+
+[dev-dependencies.sp-core]
 default-features = false
 git = 'https://github.com/paritytech/substrate.git'
 tag = '4.0.0-dev'
@@ -69,5 +101,7 @@ std = [
     'frame-support/std',
     'frame-system/std',
     'frame-benchmarking/std',
+    "pallet-balances/std",
+    'sp-std/std',
 ]
 try-runtime = ['frame-support/try-runtime']
