@@ -183,6 +183,7 @@ pub mod pallet {
 			Owner::<T>::insert(kitty_id, Some(owner.clone()));
 			KittyCount::<T>::put(kitty_id + 1u32.into());
 
+			log::info!("The kitty_id is: {:?}.", kitty_id);
 			Self::deposit_event(Event::KittyCreate(owner.clone(), kitty_id));
 			Ok(())
 		}
